@@ -1,0 +1,60 @@
+---
+title: ""
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r libraries,message = FALSE, warnings = FALSE,}
+
+library(pheatmap)
+library(dplyr)
+library(stringr)
+library(purrr)
+library(DESeq2)
+library(ggplot2)
+library(ggrepel)
+library(biomaRt)
+library(writexl)
+library(VennDiagram)
+
+```
+
+
+## Import column data
+
+```{r coldata}
+
+data <- read.table("function.prediction.tsv", sep='\t', quote="\"", header=FALSE, fill = FALSE)
+
+colnames(data) <- c("gene", "md5", "sequence_length", "analysis", "signature_accession", "signature_description", "start_location", "stop_location", "score", "status", "date", "InterPro_accession", "InterPro_description")
+
+data %>% head
+
+
+```
+
+```{r split_to_list}
+
+group_names <- data %>% group_by(analysis) %>%  group_keys() %>% pull(1)
+
+group_list <- data %>% group_by(analysis) %>% group_split() %>% set_names(group_names)
+
+write_xlsx(group_list, path = "function.prediction.xlsx")
+
+```
+
+## Session Info
+
+```{r, sessionInfo}
+
+sessionInfo()
+
+```
+
